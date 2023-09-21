@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cat App</title>
+    <style>
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        width: 100%;
+      }
+      #setup,
+      #punchline {
+        font-size: 32px;
+        color: white;
+        padding: 8px 12px;
+        letter-spacing: 2px;
+        width: auto;
+        transition: 550ms;
+      }
+      .fade-in {
+        animation: fadeIn 6s;
+      }
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- update image js call -->
+    <div class="container">
+      <div id="setup" class="fade-in"></div>
+
+      <img
+        id="cat-image"
+        src="https://t4.ftcdn.net/jpg/00/97/58/97/360_F_97589769_t45CqXyzjz0KXwoBZT9PRaWGHRk5hQqQ.jpg"
+        alt=""
+      />
+      <div id="punchline"></div>
+    </div>
+    <script src="./config.js"></script>
+    <script>
+
+      let catPicture = "test";
+      const dadJokesUrl = "https://dad-jokes.p.rapidapi.com/random/joke";
+      const dadJokesOptions = {
+        method: "GET",
+        headers: {
+          "X-RapidAPI-Key":
+            APIKEY,
+          "X-RapidAPI-Host": "dad-jokes.p.rapidapi.com",
+        },
+      };
+
+      let punchline = document.getElementById("punchline");
+      let setup = document.getElementById("setup");
+
+      function fadeJoke() {
+        setTimeout(() => {
+          setup.style.backgroundColor = 'black';
+          setup.classList.add("fade-in");
+        }, 2000);
+        setTimeout(() => {
+          punchline.style.backgroundColor = 'black';
+          punchline.classList.add("fade-in");
+        }, 4000);
+      }
+
+      //When document is loaded
+      async function fetchCats() {
+        const response = await fetch(
+          "https://api.thecatapi.com/v1/images/search"
+        );
+        const data = await response.json();
+        return data;
+      }
+      async function fetchDadJokes() {
+        const response = await fetch(dadJokesUrl, dadJokesOptions);
+        const data = await response.json();
+        return data;
+      }
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+        fadeJoke();
+        fetchCats().then((cats) => {
+          console.log(cats);
+          //update image
+          document.getElementById("cat-image").src = cats[0].url;
+        });
+        fetchDadJokes().then((quotes) => {
+            punchline.innerHTML = quotes.body[0].punchline;
+            setup.innerHTML = quotes.body[0].setup
+            fadeJoke()
+          })
+      });
+    </script>
+  </body>
+</html>
